@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bingue Web</title>
+    <style>
+        :root {
+            --bg: #0b0f14;
+            --panel: #121821;
+            --muted: #64748b;
+            --accent: #00e0a4;
+            --accent-2: #7c3aed;
+            --text: #e5e7eb;
+            --card: #0f172a;
+            --win: #10b981;
+            --danger: #ef4444;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .35)
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(1200px 600px at 80% -10%, #112, #000), var(--bg);
+            color: var(--text);
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: linear-gradient(180deg, rgba(18, 24, 33, .95), rgba(18, 24, 33, .75));
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(148, 163, 184, .15)
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 18px
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        h1 {
+            font-size: clamp(20px, 2.2vw, 28px);
+            margin: 0;
+            letter-spacing: .3px
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border: 1px solid rgba(148, 163, 184, .2);
+            border-radius: 999px;
+            background: rgba(2, 6, 23, .3);
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 18px;
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 18px
+        }
+
+        @media (max-width:980px) {
+            main {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .panel {
+            background: linear-gradient(180deg, rgba(15, 23, 42, .8), rgba(2, 6, 23, .7));
+            border: 1px solid rgba(148, 163, 184, .15);
+            border-radius: 18px;
+            box-shadow: var(--shadow)
+        }
+
+        .panel>.head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 16px;
+            border-bottom: 1px solid rgba(148, 163, 184, .12)
+        }
+
+        .panel>.body {
+            padding: 16px
+        }
+
+        .controls {
+            display: grid;
+            gap: 12px
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+
+        .control {
+            display: flex;
+            flex-direction: column;
+            gap: 6px
+        }
+
+        label {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        input[type=number],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, .2);
+            background: #0b1220;
+            color: var(--text)
+        }
+
+        .btn {
+            appearance: none;
+            border: 0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform .04s ease, filter .2s ease, box-shadow .2s ease
+        }
+
+        .btn:active {
+            transform: translateY(1px)
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #00bfb0);
+            color: #052e2b;
+            box-shadow: 0 6px 16px rgba(0, 224, 164, .25)
+        }
+
+        .btn-ghost {
+            background: #0b1220;
+            border: 1px solid rgba(148, 163, 184, .2);
+            color: var(--text)
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ef4444);
+            color: #110
+        }
+
+        .draw-area {
+            display: grid;
+            gap: 14px
+        }
+
+        .drawn {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 140px;
+            overflow: auto;
+            padding: 6px;
+            border-radius: 12px;
+            background: #0b1220;
+            border: 1px solid rgba(148, 163, 184, .15)
+        }
+
+        .ball {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            border: 1px solid rgba(148, 163, 184, .25);
+            background: radial-gradient(circle at 30% 30%, #fff3, transparent 60%), linear-gradient(180deg, #111, #0b1220)
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px
+        }
+
+        .bingo-card {
+            background: linear-gradient(180deg, rgba(11, 18, 32, .75), rgba(11, 18, 32, .55));
+            border: 1px solid rgba(148, 163, 184, .15);
+            border-radius: 18px;
+            overflow: hidden
+        }
+
+        .bingo-card .title {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            text-align: center;
+            font-weight: 800;
+            border-bottom: 1px solid rgba(148, 163, 184, .15)
+        }
+
+        .bingo-card .title span {
+            padding: 10px 0;
+            font-size: 18px;
+            letter-spacing: 1px;
+            background: linear-gradient(180deg, rgba(124, 58, 237, .2), rgba(124, 58, 237, .05))
+        }
+
+        .bingo-card .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr)
+        }
+
+        .cell {
+            position: relative;
+            aspect-ratio: 1/1;
+            display: grid;
+            place-items: center;
+            border-right: 1px dashed rgba(148, 163, 184, .12);
+            border-bottom: 1px dashed rgba(148, 163, 184, .12);
+            font-weight: 700
+        }
+
+        .cell:nth-child(5n) {
+            border-right: 0
+        }
+
+        .cell.marked::after {
+            content: "";
+            position: absolute;
+            inset: 6px;
+            border-radius: 12px;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 0 3px #00e0a433
+        }
+
+        .cell.free {
+            color: #a8a29e;
+            font-weight: 800
+        }
+
+        .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, .25);
+            background: rgba(2, 6, 23, .6);
+            color: var(--muted)
+        }
+
+        .winner {
+            outline: 2px solid var(--win);
+            box-shadow: 0 0 0 4px #10b98133
+        }
+
+        .pattern-line .cell.p-win {
+            background: linear-gradient(180deg, #032e2a, #05201e)
+        }
+
+        .pattern-corners .cell.p-win {
+            background: linear-gradient(180deg, #30123a, #1b0a22)
+        }
+
+        .pattern-full .cell.p-win {
+            background: linear-gradient(180deg, #172554, #0b1220)
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 18px;
+            background: #07131a;
+            color: #c7f9ff;
+            border: 1px solid rgba(0, 224, 164, .35);
+            padding: 10px 14px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            font-weight: 700;
+            display: none
+        }
+
+        .toast.show {
+            display: block
+        }
+
+        footer {
+            color: var(--muted);
+            font-size: 12px;
+            opacity: .8;
+            margin: 12px auto 24px
+        }
+
+        a {
+            color: var(--accent)
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="wrap row" style="justify-content:space-between">
+            <div class="row">
+                <h1>🎱 Bingo – Geração de Cartelas & Verificação</h1>
+            </div>
+            <div class="row" style="gap:8px">
+                <button id="btnReset" class="btn btn-ghost">Reiniciar</button>
+                <button id="btnDraw" class="btn btn-primary">Sortear número</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Painel lateral: controles e números sorteados -->
+        <section class="panel" aria-label="Controles">
+            <div class="head"><strong>⚙️ Controles</strong><span id="status" class="pill">Aguardando…</span></div>
+            <div class="body controls">
+                <div class="grid-2">
+                    <div class="control">
+                        <label for="qtd">Quantidade de cartelas</label>
+                        <input id="qtd" type="number" min="1" max="24" value="6" />
+                    </div>
+                    <div class="control">
+                        <label for="pattern">Padrão de vitória</label>
+                        <select id="pattern">
+                            <option value="line">Linha/Coluna/Diagonal</option>
+                            <option value="corners">4 cantos</option>
+                            <option value="full">Cartela cheia</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row" style="gap:10px">
+                    <button id="btnGenerate" class="btn btn-primary" style="flex:1">Gerar cartelas</button>
+                    <button id="btnAuto" class="btn btn-ghost" style="flex:1">Auto sortear</button>
+                </div>
+                <div class="control">
+                    <label>Números sorteados</label>
+                    <div id="drawn" class="drawn" aria-live="polite"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Área das cartelas -->
+        <section class="panel" aria-label="Cartelas">
+            <div class="head"><strong>🎟️ Cartelas</strong><span class="pill" id="cardsInfo">0 geradas</span></div>
+            <div id="cards" class="body cards"></div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast">Tem vencedor! 🎉</div>
+
+    <footer>Feito com ❤️ – sem dependências externas</footer>
+
+    <script>
+        // ——— Utilidades básicos ———
+        const $ = (sel, root = document) => root.querySelector(sel);
+        const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+        const randFrom = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const sampleUnique = (n, min, max) => {
+            const set = new Set();
+            while (set.size < n) set.add(randFrom(min, max));
+            return Array.from(set).sort((a, b) => a - b);
+        };
+
+        const RANGES = {
+            B: [1, 15], I: [16, 30], N: [31, 45], G: [46, 60], O: [61, 75]
+        };
+
+        // Estado do jogo
+        const state = {
+            drawn: new Set(),
+            cards: [], // cada cartela: { id, grid: number[25], marked:Set<number>, el:HTMLElement }
+            running: false,
+            timer: null,
+            pattern: 'line'
+        };
+
+        // Cria uma cartela clássica 5x5 com espaço livre no centro
+        function createCard(id) {
+            const grid = [];
+            const cols = ['B', 'I', 'N', 'G', 'O'];
+            for (let c = 0; c < 5; c++) {
+                const [min, max] = RANGES[cols[c]];
+                const nums = sampleUnique(5, min, max);
+                for (let r = 0; r < 5; r++) grid[r * 5 + c] = nums[r];
+            }
+            grid[12] = 'FREE';
+            const marked = new Set(['FREE']);
+            return { id, grid, marked };
+        }
+
+        // Renderiza uma cartela
+        function renderCard(card) {
+            const cardEl = document.createElement('div');
+            cardEl.className = 'bingo-card';
+            card.el = cardEl;
+            const title = document.createElement('div');
+            title.className = 'title';
+            'BINGO'.split('').forEach(ch => {
+                const s = document.createElement('span'); s.textContent = ch; title.appendChild(s);
+            });
+            cardEl.appendChild(title);
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            card.grid.forEach((num, i) => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.index = i;
+                if (num === 'FREE') {
+                    cell.classList.add('free', 'marked');
+                    cell.innerHTML = '<small>FREE</small>';
+                } else {
+                    cell.textContent = num;
+                }
+                grid.appendChild(cell);
+            });
+            const badge = document.createElement('div');
+            badge.className = 'badge';
+            badge.textContent = `#${card.id}`;
+            cardEl.appendChild(badge);
+            cardEl.appendChild(grid);
+            return cardEl;
+        }
+
+        // Marca células conforme sorteios
+        function updateMarks(card) {
+            const cells = $$('.cell', card.el);
+            cells.forEach((cell, i) => {
+                const val = card.grid[i];
+                if (val === 'FREE' || state.drawn.has(val)) {
+                    cell.classList.add('marked');
+                }
+            });
+        }
+
+        // Padrões de vitória
+        function getWinningLines() {
+            const lines = [];
+            // rows
+            for (let r = 0; r < 5; r++) lines.push([0, 1, 2, 3, 4].map(c => r * 5 + c));
+            // cols
+            for (let c = 0; c < 5; c++) lines.push([0, 1, 2, 3, 4].map(r => r * 5 + c));
+            // diagonals
+            lines.push([0, 6, 12, 18, 24]);
+            lines.push([4, 8, 12, 16, 20]);
+            return lines;
+        }
+
+        function checkWinner(card, pattern) {
+            const cells = $$('.cell', card.el);
+            const has = idx => {
+                const v = card.grid[idx];
+                return v === 'FREE' || state.drawn.has(v);
+            };
+
+            // limpar highlights prévios
+            cells.forEach(c => c.classList.remove('p-win'));
+            card.el.classList.remove('pattern-line', 'pattern-corners', 'pattern-full');
+
+            if (pattern === 'corners') {
+                const corners = [0, 4, 20, 24];
+                const ok = corners.every(has);
+                if (ok) { corners.forEach(i => cells[i].classList.add('p-win')); card.el.classList.add('winner', 'pattern-corners'); return true; }
+                return false;
+            }
+
+            if (pattern === 'full') {
+                const ok = card.grid.every((_, i) => has(i));
+                if (ok) { cells.forEach(c => c.classList.add('p-win')); card.el.classList.add('winner', 'pattern-full'); return true; }
+                return false;
+            }
+
+            // default: qualquer linha/coluna/diagonal
+            const lines = getWinningLines();
+            for (const line of lines) {
+                if (line.every(has)) {
+                    line.forEach(i => cells[i].classList.add('p-win'));
+                    card.el.classList.add('winner', 'pattern-line');
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function updateWinners() {
+            let any = false; const pattern = state.pattern;
+            state.cards.forEach(card => {
+                const won = checkWinner(card, pattern);
+                if (won) any = true; else card.el.classList.remove('winner');
+            });
+            if (any) showToast('Tem vencedor! 🎉');
+            $('#status').textContent = any ? '🏆 Vitória encontrada' : `Sorteados: ${state.drawn.size}`;
+        }
+
+        // Sorteio de números únicos
+        function drawNumber() {
+            if (state.drawn.size >= 75) return null;
+            let n;
+            do { n = randFrom(1, 75); } while (state.drawn.has(n));
+            state.drawn.add(n);
+            addBall(n);
+            state.cards.forEach(updateMarks);
+            updateWinners();
+            return n;
+        }
+
+        function addBall(n) {
+            const div = document.createElement('div');
+            div.className = 'ball';
+            const letter = n <= 15 ? 'B' : n <= 30 ? 'I' : n <= 45 ? 'N' : n <= 60 ? 'G' : 'O';
+            div.title = `${letter}-${n}`;
+            div.textContent = n;
+            $('#drawn').prepend(div);
+        }
+
+        function resetGame(keepCards = false) {
+            state.drawn.clear();
+            $('#drawn').innerHTML = '';
+            $('#status').textContent = 'Aguardando…';
+            if (!keepCards) {
+                state.cards = [];
+                $('#cards').innerHTML = '';
+                $('#cardsInfo').textContent = '0 geradas';
+            } else {
+                // unmark visuals
+                state.cards.forEach(c => {
+                    $$('.cell', c.el).forEach(cell => cell.classList.remove('marked', 'p-win'));
+                    c.el.classList.remove('winner', 'pattern-line', 'pattern-corners', 'pattern-full');
+                });
+            }
+            stopAuto();
+        }
+
+        // Auto sorteio
+        function toggleAuto() {
+            if (state.running) { stopAuto(); }
+            else { startAuto(); }
+        }
+        function startAuto() {
+            state.running = true; $('#btnAuto').textContent = 'Parar auto';
+            state.timer = setInterval(() => {
+                const n = drawNumber();
+                if (n === null) stopAuto();
+            }, 900);
+        }
+        function stopAuto() {
+            state.running = false; $('#btnAuto').textContent = 'Auto sortear';
+            if (state.timer) clearInterval(state.timer);
+            state.timer = null;
+        }
+
+        function showToast(msg) {
+            const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 1600);
+        }
+
+        // Eventos UI
+        $('#btnGenerate').addEventListener('click', () => {
+            resetGame(false); // apenas limpar sorteios
+            const n = Math.min(Math.max(parseInt($('#qtd').value || '1', 10), 1), 24);
+            if (state.cards.length > 0) { $('#cards').innerHTML = ''; state.cards = []; }
+            for (let i = 1; i <= n; i++) {
+                const card = createCard(i);
+                const el = renderCard(card);
+                card.el = el;
+                $('#cards').appendChild(el);
+                state.cards.push(card);
+            }
+            $('#cardsInfo').textContent = `${n} geradas`;
+            showToast('Cartelas prontas!');
+        });
+
+        $('#btnDraw').addEventListener('click', () => {
+            const n = drawNumber();
+            if (n === null) showToast('Todos os números foram sorteados.');
+        });
+
+        $('#btnReset').addEventListener('click', () => resetGame());
+        $('#btnAuto').addEventListener('click', toggleAuto);
+        $('#pattern').addEventListener('change', (e) => { state.pattern = e.target.value; updateWinners(); });
+
+        // Geração inicial
+        (function init() { $('#btnGenerate').click(); })();
+    </script>
+</body>
+
+</html>
